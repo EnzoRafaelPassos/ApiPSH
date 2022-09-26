@@ -10,10 +10,10 @@ namespace PshApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UsuarioController : ControllerBase
+    public class UsuariosController : ControllerBase
     {
         private readonly DataContext _context;
-        public UsuarioController(DataContext context)
+        public UsuariosController(DataContext context)
         {
             _context = context;
         }
@@ -35,7 +35,7 @@ namespace PshApi.Controllers
         }
 
         // Metodo pra ve se o usuario existe
-        public async Task<bool> UsuariExistente(string username)
+        public async Task<bool> UsuarioExistente(string username)
         {
             if (await _context.Usuarios.AnyAsync(x => x.Username.ToLower() == username.ToLower()))
             {
@@ -50,14 +50,14 @@ namespace PshApi.Controllers
         {
             try
             {
-                if (await UsuariExistente(user.Username))
-                    throw new System.Exception("Nome de usuario ja existente");
+                if (await UsuarioExistente(user.Username))
+                    throw new System.Exception("Nome de usuario ja existe");
 
                 Criptografia.CriarPasswordHash(user.PasswordString, out byte[] hash, out byte[] salt);
                 user.PasswordString = string.Empty;
                 user.PasswordHash = hash;
                 user.PasswordSalt = salt;
-                await _context.Usuarios.AddAsync(user);
+                await _context.Usuarios.AddAsync(user); 
                 await _context.SaveChangesAsync();
 
                 return Ok(user.Id);
@@ -97,8 +97,8 @@ namespace PshApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        // Buscar usuario por Id
-        [HttpGet("{usuarioId}")]
+        // Buscar Usuario por Id
+        [HttpGet("{UsuarioId}")]
         public async Task<IActionResult> GetUsuario(int usuarioId)
         {
             try
